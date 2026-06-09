@@ -28,9 +28,9 @@ export default function App() {
     setTodos(latest);
   }
 
-  async function handleAdd(title: string, category: Category, priority: Priority) {
+  async function handleAdd(title: string, category: Category, priority: Priority, dueDate: string | null) {
     try {
-      await api.createTodo({ title, category, priority });
+      await api.createTodo({ title, category, priority, due_date: dueDate });
       await refresh();
     } catch (e) {
       setError(e instanceof Error ? e.message : '添加失败');

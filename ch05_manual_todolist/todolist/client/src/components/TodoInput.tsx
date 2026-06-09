@@ -4,13 +4,14 @@ import type { Category, Priority } from '../types/todo';
 import { CATEGORIES, PRIORITIES } from '../types/todo';
 
 interface Props {
-  onAdd: (title: string, category: Category, priority: Priority) => Promise<void> | void;
+  onAdd: (title: string, category: Category, priority: Priority, dueDate: string | null) => Promise<void> | void;
 }
 
 export default function TodoInput({ onAdd }: Props) {
   const [title, setTitle] = useState('');
   const [category, setCategory] = useState<Category>('other');
   const [priority, setPriority] = useState<Priority>('medium');
+  const [dueDate, setDueDate] = useState<string>('');
   const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: FormEvent) {
@@ -20,8 +21,9 @@ export default function TodoInput({ onAdd }: Props) {
 
     setSubmitting(true);
     try {
-      await onAdd(trimmed, category, priority);
+      await onAdd(trimmed, category, priority, dueDate || null);
       setTitle('');
+      setDueDate('');
     } finally {
       setSubmitting(false);
     }
@@ -84,6 +86,27 @@ export default function TodoInput({ onAdd }: Props) {
               {p.label}
             </button>
           ))}
+        </div>
+
+        {/* 截止日期 */}
+        <div className="flex items-center gap-1.5">
+          <span className="text-xs text-gray-400 mr-0.5">截止</span>
+          <input
+            type="date"
+            value={dueDate}
+            onChange={(e) => setDueDate(e.target.value)}
+            className="px-2 py-0.5 text-xs border border-gray-300 rounded text-gray-600 focus:outline-none focus:ring-1 focus:ring-blue-400"
+          />
+          {dueDate && (
+            <button
+              type="button"
+              onClick={() => setDueDate('')}
+              className="text-xs text-gray-400 hover:text-gray-600"
+              title="清除截止日期"
+            >
+              ✕
+            </button>
+          )}
         </div>
       </div>
     </form>

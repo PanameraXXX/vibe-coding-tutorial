@@ -22,12 +22,22 @@ export const PRIORITIES: { value: Priority; label: string; borderClass: string }
   { value: 'low',    label: '低', borderClass: 'border-l-gray-200' },
 ];
 
+// YYYY-MM-DD 校验：合法日期字符串
+export const DUE_DATE_REGEX = /^\d{4}-\d{2}-\d{2}$/;
+
+export function isValidDueDate(s: unknown): s is string {
+  if (typeof s !== 'string' || !DUE_DATE_REGEX.test(s)) return false;
+  const d = new Date(s + 'T00:00:00Z');
+  return !Number.isNaN(d.getTime()) && d.toISOString().slice(0, 10) === s;
+}
+
 export interface Todo {
   id: number;
   title: string;
   completed: boolean;
   category: Category;
   priority: Priority;
+  due_date: string | null;
   created_at: string;
 }
 
@@ -35,6 +45,7 @@ export interface CreateTodoInput {
   title: string;
   category?: Category;
   priority?: Priority;
+  due_date?: string | null;
 }
 
 export interface UpdateTodoInput {
@@ -42,4 +53,5 @@ export interface UpdateTodoInput {
   completed?: boolean;
   category?: Category;
   priority?: Priority;
+  due_date?: string | null;
 }

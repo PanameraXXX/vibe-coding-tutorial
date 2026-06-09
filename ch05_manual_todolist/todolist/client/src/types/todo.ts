@@ -29,6 +29,7 @@ export interface Todo {
   completed: boolean;
   category: Category;
   priority: Priority;
+  due_date: string | null;
   created_at: string;
 }
 
@@ -36,6 +37,7 @@ export interface CreateTodoInput {
   title: string;
   category?: Category;
   priority?: Priority;
+  due_date?: string | null;
 }
 
 export interface UpdateTodoInput {
@@ -43,4 +45,5 @@ export interface UpdateTodoInput {
   completed?: boolean;
   category?: Category;
   priority?: Priority;
+  due_date?: string | null;
 }

@@ -1,7 +1,7 @@
 // /api/todos 路由
 import { Router, Request, Response } from 'express';
 import { listTodos, createTodo, updateTodo, deleteTodo } from '../db.js';
-import { CATEGORIES, PRIORITIES } from '../types/todo.js';
+import { CATEGORIES, PRIORITIES, isValidDueDate } from '../types/todo.js';
 import type { Category, Priority } from '../types/todo.js';
 
 const VALID_CATEGORIES = new Set(CATEGORIES.map((c) => c.value));
@@ -18,18 +18,20 @@ router.get('/', (req: Request, res: Response) => {
   res.json(listTodos(cat as Category | undefined));
 });
 
-// POST /api/todos —— 创建待办，body: { title, category?, priority? }
+// POST /api/todos —— 创建待办，body: { title, category?, priority?, due_date? }
 router.post('/', (req: Request, res: Response) => {
   const title = typeof req.body?.title === 'string' ? req.body.title.trim() : '';
   if (!title) return res.status(400).json({ error: 'title 不能为空' });
 
-  const { category, priority } = req.body ?? {};
+  const { category, priority, due_date } = req.body ?? {};
   if (category !== undefined && !VALID_CATEGORIES.has(category))
     return res.status(400).json({ error: '分类不合法' });
   if (priority !== undefined && !VALID_PRIORITIES.has(priority))
     return res.status(400).json({ error: '优先级不合法' });
+  if (due_date !== undefined && due_date !== null && !isValidDueDate(due_date))
+    return res.status(400).json({ error: 'due_date 必须为 YYYY-MM-DD 合法日期' });
 
-  const todo = createTodo({ title, category, priority });
+  const todo = createTodo({ title, category, priority, due_date });
   res.status(201).json(todo);
 });
 
@@ -38,7 +40,7 @@ router.patch('/:id', (req: Request, res: Response) => {
   const id = Number(req.params.id);
   if (!Number.isInteger(id)) return res.status(400).json({ error: 'id 不合法' });
 
-  const { title, completed, category, priority } = req.body ?? {};
+  const { title, completed, category, priority, due_date } = req.body ?? {};
 
   if (title !== undefined && typeof title !== 'string')
     return res.status(400).json({ error: 'title 必须是字符串' });
@@ -48,7 +50,9 @@ router.patch('/:id', (req: Request, res: Response) => {
     return res.status(400).json({ error: '分类不合法' });
   if (priority !== undefined && !VALID_PRIORITIES.has(priority))
     return res.status(400).json({ error: '优先级不合法' });
-  if (title === undefined && completed === undefined && category === undefined && priority === undefined)
+  if (due_date !== undefined && due_date !== null && !isValidDueDate(due_date))
+    return res.status(400).json({ error: 'due_date 必须为 YYYY-MM-DD 合法日期或 null' });
+  if (title === undefined && completed === undefined && category === undefined && priority === undefined && due_date === undefined)
     return res.status(400).json({ error: '至少传入一个更新字段' });
 
   const updated = updateTodo(id, {
@@ -56,6 +60,7 @@ router.patch('/:id', (req: Request, res: Response) => {
     ...(completed !== undefined ? { completed } : {}),
     ...(category !== undefined ? { category } : {}),
     ...(priority !== undefined ? { priority } : {}),
+    ...(due_date !== undefined ? { due_date } : {}),
   });
 
   if (!updated) return res.status(404).json({ error: '待办不存在' });
