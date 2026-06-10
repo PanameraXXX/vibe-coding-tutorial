@@ -1,4 +1,4 @@
-// 数据库层：SQLite 初始化 + 待办增删改查
+// 数据库层：SQLite 初始化 + 待办增删改查（按用户隔离）
 import Database from 'better-sqlite3';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -12,10 +12,11 @@ if (!fs.existsSync(dbDir)) {
   fs.mkdirSync(dbDir, { recursive: true });
 }
 
-const db = new Database(DB_PATH);
+// 导出 db 句柄给 users.ts / session store 复用
+export const db = new Database(DB_PATH);
 db.pragma('journal_mode = WAL');
 
-// 初始化表结构（含 category + priority + due_date）
+// 初始化表结构（含 category + priority + due_date + user_id）
 db.exec(`
   CREATE TABLE IF NOT EXISTS todos (
     id            INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -25,6 +26,7 @@ db.exec(`
     priority      TEXT    NOT NULL DEFAULT 'medium',
     priority_sort INTEGER NOT NULL DEFAULT 2,
     due_date      TEXT,
+    user_id       INTEGER NOT NULL DEFAULT 0,
     created_at    TEXT    NOT NULL
   );
 `);
@@ -33,6 +35,7 @@ db.exec(`
 try { db.exec(`ALTER TABLE todos ADD COLUMN priority TEXT NOT NULL DEFAULT 'medium'`); } catch { /* ok */ }
 try { db.exec(`ALTER TABLE todos ADD COLUMN priority_sort INTEGER NOT NULL DEFAULT 2`); } catch { /* ok */ }
 try { db.exec(`ALTER TABLE todos ADD COLUMN due_date TEXT`); } catch { /* ok */ }
+try { db.exec(`ALTER TABLE todos ADD COLUMN user_id INTEGER NOT NULL DEFAULT 0`); } catch { /* ok */ }
 
 interface TodoRow {
   id: number;
@@ -56,12 +59,11 @@ function rowToTodo(row: TodoRow): Todo {
   };
 }
 
-// ---------- 增删改查 ----------
+// ---------- 增删改查（全部按 user_id 过滤）----------
 
 // 查询：未完成在上 → 已过期(未完成)优先 → 按优先级(高→中→低) → 按创建时间倒序
-// 用 SQL 当天日期判断过期：date('now', 'localtime') 是本地今天的 YYYY-MM-DD
-function baseQuery(whereClause?: string, params?: (string | number)[]): Todo[] {
-  const where = whereClause ?? '';
+function baseQuery(userId: number, extraWhere?: string, extraParams?: (string | number)[]): Todo[] {
+  const where = extraWhere ? `WHERE user_id = ? AND ${extraWhere}` : 'WHERE user_id = ?';
   const stmt = db.prepare(
     `SELECT id, title, completed, category, priority, due_date, created_at
      FROM todos ${where}
@@ -71,27 +73,28 @@ function baseQuery(whereClause?: string, params?: (string | number)[]): Todo[] {
        priority_sort DESC,
        created_at DESC`
   );
-  const rows = (params ? stmt.all(...params) : stmt.all()) as TodoRow[];
+  const params: (string | number)[] = [userId, ...(extraParams ?? [])];
+  const rows = stmt.all(...params) as TodoRow[];
   return rows.map(rowToTodo);
 }
 
-export function listTodos(category?: Category): Todo[] {
+export function listTodos(userId: number, category?: Category): Todo[] {
   if (category) {
-    return baseQuery('WHERE category = ?', [category]);
+    return baseQuery(userId, 'category = ?', [category]);
   }
-  return baseQuery();
+  return baseQuery(userId);
 }
 
-export function getTodo(id: number): Todo | null {
+export function getTodo(userId: number, id: number): Todo | null {
   const row = db
-    .prepare<[number], TodoRow>(
-      'SELECT id, title, completed, category, priority, due_date, created_at FROM todos WHERE id = ?'
+    .prepare<[number, number], TodoRow>(
+      'SELECT id, title, completed, category, priority, due_date, created_at FROM todos WHERE id = ? AND user_id = ?'
     )
-    .get(id);
+    .get(id, userId);
   return row ? rowToTodo(row) : null;
 }
 
-export function createTodo(input: CreateTodoInput): Todo {
+export function createTodo(userId: number, input: CreateTodoInput): Todo {
   const createdAt = new Date().toISOString();
   const category = input.category ?? 'other';
   const priority = input.priority ?? 'medium';
@@ -99,15 +102,15 @@ export function createTodo(input: CreateTodoInput): Todo {
   const dueDate = input.due_date ?? null;
   const result = db
     .prepare(
-      'INSERT INTO todos (title, completed, category, priority, priority_sort, due_date, created_at) VALUES (?, 0, ?, ?, ?, ?, ?)'
+      'INSERT INTO todos (title, completed, category, priority, priority_sort, due_date, user_id, created_at) VALUES (?, 0, ?, ?, ?, ?, ?, ?)'
     )
-    .run(input.title, category, priority, sortVal, dueDate, createdAt);
-  return getTodo(Number(result.lastInsertRowid))!;
+    .run(input.title, category, priority, sortVal, dueDate, userId, createdAt);
+  return getTodo(userId, Number(result.lastInsertRowid))!;
 }
 
 // 部分更新（title / completed / category / priority / due_date 任意组合）
-export function updateTodo(id: number, input: UpdateTodoInput): Todo | null {
-  const existing = getTodo(id);
+export function updateTodo(userId: number, id: number, input: UpdateTodoInput): Todo | null {
+  const existing = getTodo(userId, id);
   if (!existing) return null;
 
   const fields: string[] = [];
@@ -137,12 +140,18 @@ export function updateTodo(id: number, input: UpdateTodoInput): Todo | null {
 
   if (fields.length === 0) return existing;
 
-  values.push(id);
-  db.prepare(`UPDATE todos SET ${fields.join(', ')} WHERE id = ?`).run(...values);
-  return getTodo(id);
+  values.push(id, userId);
+  db.prepare(`UPDATE todos SET ${fields.join(', ')} WHERE id = ? AND user_id = ?`).run(...values);
+  return getTodo(userId, id);
 }
 
-export function deleteTodo(id: number): boolean {
-  const result = db.prepare('DELETE FROM todos WHERE id = ?').run(id);
+export function deleteTodo(userId: number, id: number): boolean {
+  const result = db.prepare('DELETE FROM todos WHERE id = ? AND user_id = ?').run(id, userId);
   return result.changes > 0;
+}
+
+// 首注册用户认领 user_id=0 的孤儿 todos
+export function claimOrphanTodos(userId: number): number {
+  const result = db.prepare('UPDATE todos SET user_id = ? WHERE user_id = 0').run(userId);
+  return result.changes;
 }
