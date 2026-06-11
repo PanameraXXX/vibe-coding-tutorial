@@ -1,0 +1,19 @@
+{
+  "name": "todolist-tests",
+  "version": "1.0.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "FORCE_COLOR=1 vitest run",
+    "test:watch": "FORCE_COLOR=1 vitest"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "@types/better-sqlite3": "^7.6.11",
+    "@types/node": "^22.7.4",
+    "bcryptjs": "^3.0.3",
+    "better-sqlite3": "^11.3.0",
+    "typescript": "^5.6.2",
+    "vitest": "^2.1.9"
+  }
+}
