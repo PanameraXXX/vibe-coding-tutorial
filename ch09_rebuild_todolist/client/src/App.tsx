@@ -13,23 +13,39 @@ export default function App() {
   }, []);
 
   async function handleAdd(title: string) {
-    const t = await api.createTodo(title);
-    setTodos((prev) => [...prev, t]);
+    try {
+      const t = await api.createTodo(title);
+      setTodos((prev) => [...prev, t]);
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function handleToggle(id: number, done: boolean) {
-    const t = await api.updateTodo(id, { done });
-    setTodos((prev) => prev.map((x) => (x.id === id ? t : x)));
+    try {
+      const t = await api.updateTodo(id, { done });
+      setTodos((prev) => prev.map((x) => (x.id === id ? t : x)));
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function handleEdit(id: number, title: string) {
-    const t = await api.updateTodo(id, { title });
-    setTodos((prev) => prev.map((x) => (x.id === id ? t : x)));
+    try {
+      const t = await api.updateTodo(id, { title });
+      setTodos((prev) => prev.map((x) => (x.id === id ? t : x)));
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   async function handleDelete(id: number) {
-    await api.deleteTodo(id);
-    setTodos((prev) => prev.filter((x) => x.id !== id));
+    try {
+      await api.deleteTodo(id);
+      setTodos((prev) => prev.filter((x) => x.id !== id));
+    } catch (e) {
+      console.error(e);
+    }
   }
 
   return (

@@ -44,14 +44,20 @@ export function TodoItem({ todo, onToggle, onEdit, onDelete }: Props) {
       ) : (
         <span
           className={`flex-1 ${todo.done ? 'line-through text-gray-400' : ''}`}
-          onDoubleClick={() => setEditing(true)}
+          onDoubleClick={() => {
+            setDraft(todo.title);
+            setEditing(true);
+          }}
         >
           {todo.title}
         </span>
       )}
       <button
         className="text-sm text-gray-500 hover:text-gray-800"
-        onClick={() => setEditing((v) => !v)}
+        onClick={() => {
+          setDraft(todo.title);
+          setEditing(true);
+        }}
       >
         编辑
       </button>
