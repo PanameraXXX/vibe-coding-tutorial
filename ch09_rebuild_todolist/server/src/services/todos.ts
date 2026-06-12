@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import type { Todo, CreateTodoInput } from '../types';
+import type { Todo, CreateTodoInput, UpdateTodoInput } from '../types';
 
 interface TodoRow {
   id: number;
@@ -36,4 +36,29 @@ export function getAllTodos(db: Database.Database): Todo[] {
     .prepare('SELECT id, title, done, created_at FROM todos ORDER BY id ASC')
     .all() as TodoRow[];
   return rows.map(rowToTodo);
+}
+
+export function updateTodo(
+  db: Database.Database,
+  id: number,
+  input: UpdateTodoInput
+): Todo | null {
+  const existing = db
+    .prepare('SELECT id, title, done, created_at FROM todos WHERE id = ?')
+    .get(id) as TodoRow | undefined;
+  if (!existing) return null;
+
+  const nextTitle = input.title ?? existing.title;
+  const nextDone = input.done === undefined ? existing.done : input.done ? 1 : 0;
+  db.prepare('UPDATE todos SET title = ?, done = ? WHERE id = ?').run(
+    nextTitle,
+    nextDone,
+    id
+  );
+  return rowToTodo({ ...existing, title: nextTitle, done: nextDone });
+}
+
+export function deleteTodo(db: Database.Database, id: number): boolean {
+  const info = db.prepare('DELETE FROM todos WHERE id = ?').run(id);
+  return info.changes > 0;
 }
