@@ -78,12 +78,30 @@ export function updateTodo(
     .get(id, userId) as TodoRow | undefined;
   if (!existing) return null;
 
+  // 语义：input 字段为 undefined → 不动；为 null → 清空；为值 → 更新
   const nextTitle = input.title ?? existing.title;
   const nextDone = input.done === undefined ? existing.done : input.done ? 1 : 0;
+  const nextCategory =
+    input.category === undefined ? existing.category : input.category;
+  const nextPriority =
+    input.priority === undefined ? existing.priority : input.priority;
+  const nextDueDate =
+    input.dueDate === undefined ? existing.due_date : input.dueDate;
+
   db.prepare(
-    'UPDATE todos SET title = ?, done = ? WHERE id = ? AND user_id = ?'
-  ).run(nextTitle, nextDone, id, userId);
-  return rowToTodo({ ...existing, title: nextTitle, done: nextDone });
+    `UPDATE todos
+       SET title = ?, done = ?, category = ?, priority = ?, due_date = ?
+     WHERE id = ? AND user_id = ?`
+  ).run(nextTitle, nextDone, nextCategory, nextPriority, nextDueDate, id, userId);
+
+  return rowToTodo({
+    ...existing,
+    title: nextTitle,
+    done: nextDone,
+    category: nextCategory,
+    priority: nextPriority,
+    due_date: nextDueDate,
+  });
 }
 
 export function deleteTodo(

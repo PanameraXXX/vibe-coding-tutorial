@@ -106,4 +106,57 @@ describe('todos service', () => {
     expect(t.priority).toBeNull();
     expect(t.dueDate).toBeNull();
   });
+
+  it('排序：priority DESC NULLS LAST，同优先级按 dueDate ASC NULLS LAST', () => {
+    const { db, aliceId } = bootstrap();
+    createTodo(db, aliceId, { title: 'B 高 早', priority: 3, dueDate: '2026-06-15' });
+    createTodo(db, aliceId, { title: 'C 高 晚', priority: 3, dueDate: '2026-06-20' });
+    createTodo(db, aliceId, { title: 'E 中 中', priority: 2, dueDate: '2026-06-18' });
+    createTodo(db, aliceId, { title: 'D 低 早', priority: 1, dueDate: '2026-06-15' });
+    createTodo(db, aliceId, { title: 'A 中无日期', priority: 2 });
+    createTodo(db, aliceId, { title: 'F 全空' });
+
+    const titles = getAllTodos(db, aliceId).map((t) => t.title);
+    expect(titles).toEqual([
+      'B 高 早',
+      'C 高 晚',
+      'E 中 中',
+      'A 中无日期',
+      'D 低 早',
+      'F 全空',
+    ]);
+  });
+
+  it('update：传 null 清空字段', () => {
+    const { db, aliceId } = bootstrap();
+    const t = createTodo(db, aliceId, {
+      title: 'x',
+      category: '工作',
+      priority: 2,
+      dueDate: '2026-06-15',
+    });
+    const updated = updateTodo(db, aliceId, t.id, {
+      category: null,
+      priority: null,
+      dueDate: null,
+    });
+    expect(updated!.category).toBeNull();
+    expect(updated!.priority).toBeNull();
+    expect(updated!.dueDate).toBeNull();
+  });
+
+  it('update：不传字段则不动', () => {
+    const { db, aliceId } = bootstrap();
+    const t = createTodo(db, aliceId, {
+      title: 'x',
+      category: '工作',
+      priority: 2,
+      dueDate: '2026-06-15',
+    });
+    const updated = updateTodo(db, aliceId, t.id, { title: 'y' });
+    expect(updated!.title).toBe('y');
+    expect(updated!.category).toBe('工作');
+    expect(updated!.priority).toBe(2);
+    expect(updated!.dueDate).toBe('2026-06-15');
+  });
 });
