@@ -69,6 +69,15 @@ export function getAllTodos(
   if (filters.done === 'active') where.push('done = 0');
   if (filters.done === 'done') where.push('done = 1');
 
+  if (filters.category) {
+    where.push('category = ?');
+    params.push(filters.category);
+  }
+  if (filters.priority) {
+    where.push('priority = ?');
+    params.push(filters.priority);
+  }
+
   const sql = `SELECT ${SELECT_COLUMNS} FROM todos WHERE ${where.join(' AND ')} ${ORDER_BY}`;
   const rows = db.prepare(sql).all(...params) as TodoRow[];
   return rows.map(rowToTodo);

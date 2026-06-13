@@ -179,4 +179,24 @@ describe('todos service', () => {
     const list = getAllTodos(db, aliceId, { done: 'done' });
     expect(list.map((t) => t.id)).toEqual([t2.id]);
   });
+
+  it("过滤：category 精确匹配", () => {
+    const { db, aliceId } = bootstrap();
+    createTodo(db, aliceId, { title: 'a', category: '工作' });
+    createTodo(db, aliceId, { title: 'b', category: '生活' });
+    createTodo(db, aliceId, { title: 'c' });
+
+    const list = getAllTodos(db, aliceId, { category: '工作' });
+    expect(list.map((t) => t.title)).toEqual(['a']);
+  });
+
+  it("过滤：priority 精确匹配", () => {
+    const { db, aliceId } = bootstrap();
+    createTodo(db, aliceId, { title: 'a', priority: 3 });
+    createTodo(db, aliceId, { title: 'b', priority: 2 });
+    createTodo(db, aliceId, { title: 'c' });
+
+    const list = getAllTodos(db, aliceId, { priority: 3 });
+    expect(list.map((t) => t.title)).toEqual(['a']);
+  });
 });
