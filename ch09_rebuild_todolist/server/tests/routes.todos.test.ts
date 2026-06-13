@@ -151,4 +151,56 @@ describe('todos routes', () => {
     expect(res.body.priority).toBeNull();
     expect(res.body.dueDate).toBeNull();
   });
+
+  it("GET /api/todos?done=active 只返回未完成", async () => {
+    const agent = request.agent(newApp());
+    await loginAs(agent, 'alice');
+    const a = await agent.post('/api/todos').send({ title: 'a' });
+    const b = await agent.post('/api/todos').send({ title: 'b' });
+    await agent.patch(`/api/todos/${b.body.id}`).send({ done: true });
+
+    const res = await agent.get('/api/todos?done=active');
+    expect(res.status).toBe(200);
+    expect(res.body.map((t: { id: number }) => t.id)).toEqual([a.body.id]);
+  });
+
+  it("GET /api/todos?priority=invalid → 400", async () => {
+    const agent = request.agent(newApp());
+    await loginAs(agent, 'alice');
+    const res = await agent.get('/api/todos?priority=invalid');
+    expect(res.status).toBe(400);
+  });
+
+  it("GET /api/todos?due=tomorrow → 400", async () => {
+    const agent = request.agent(newApp());
+    await loginAs(agent, 'alice');
+    const res = await agent.get('/api/todos?due=tomorrow');
+    expect(res.status).toBe(400);
+  });
+
+  it("GET /api/todos?done=maybe → 400", async () => {
+    const agent = request.agent(newApp());
+    await loginAs(agent, 'alice');
+    const res = await agent.get('/api/todos?done=maybe');
+    expect(res.status).toBe(400);
+  });
+
+  it("GET /api/todos 综合 query → 200 AND", async () => {
+    const agent = request.agent(newApp());
+    await loginAs(agent, 'alice');
+    const a = await agent
+      .post('/api/todos')
+      .send({ title: '写课件', priority: 3, category: '工作' });
+    await agent.post('/api/todos').send({ title: '买菜', priority: 3 });
+    await agent.post('/api/todos').send({ title: '写课件 done', priority: 3 });
+
+    const res = await agent.get(
+      '/api/todos?done=active&priority=3&q=' +
+        encodeURIComponent('课件') +
+        '&category=' +
+        encodeURIComponent('工作')
+    );
+    expect(res.status).toBe(200);
+    expect(res.body.map((t: { id: number }) => t.id)).toEqual([a.body.id]);
+  });
 });

@@ -6,6 +6,7 @@ import {
   updateTodo,
   deleteTodo,
 } from '../services/todos';
+import type { ListFilters } from '../types';
 
 // 此处假定上游已经过 requireAuth 中间件，session.userId 一定存在
 function userId(req: Request): number {
@@ -42,7 +43,51 @@ export function createTodosRouter(db: Database.Database): Router {
   const router = Router();
 
   router.get('/', (req: Request, res: Response) => {
-    res.json(getAllTodos(db, userId(req)));
+    const filters: ListFilters = {};
+
+    const done = req.query.done;
+    if (done !== undefined) {
+      if (done !== 'active' && done !== 'done') {
+        res.status(400).json({ error: 'done 必须是 active 或 done' });
+        return;
+      }
+      filters.done = done;
+    }
+
+    const category = req.query.category;
+    if (typeof category === 'string' && category.trim()) {
+      filters.category = category;
+    }
+
+    const priority = req.query.priority;
+    if (priority !== undefined) {
+      if (priority !== '1' && priority !== '2' && priority !== '3') {
+        res.status(400).json({ error: 'priority 必须是 1/2/3' });
+        return;
+      }
+      filters.priority = Number(priority) as 1 | 2 | 3;
+    }
+
+    const due = req.query.due;
+    if (due !== undefined) {
+      if (
+        due !== 'today' &&
+        due !== 'week' &&
+        due !== 'overdue' &&
+        due !== 'none'
+      ) {
+        res.status(400).json({ error: 'due 非法' });
+        return;
+      }
+      filters.due = due;
+    }
+
+    const q = req.query.q;
+    if (typeof q === 'string' && q.length > 0) {
+      filters.q = q;
+    }
+
+    res.json(getAllTodos(db, userId(req), filters));
   });
 
   router.post('/', (req: Request, res: Response) => {
