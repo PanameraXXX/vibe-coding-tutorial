@@ -1,21 +1,32 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import type { Todo } from '../types';
 import * as api from '../api';
+import type { Filters } from '../api';
 import { useAuth } from '../auth/AuthContext';
 import { TodoForm, type TodoFormValues } from '../components/TodoForm';
 import { TodoList } from '../components/TodoList';
+import { FilterBar } from '../components/FilterBar';
+
+const DEFAULT_FILTERS: Filters = {
+  done: 'all',
+  category: '',
+  priority: '',
+  due: '',
+  q: '',
+};
 
 export default function TodosPage() {
   const { user, logout } = useAuth();
   const [todos, setTodos] = useState<Todo[]>([]);
+  const [filters, setFilters] = useState<Filters>(DEFAULT_FILTERS);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
   // 写操作完成后刷新整个列表，保证排序与最新值一致
   async function refetch() {
     try {
-      const list = await api.fetchTodos();
+      const list = await api.fetchTodos(filters);
       setTodos(list);
     } catch (e) {
       setError(e instanceof Error ? e.message : String(e));
@@ -24,7 +35,17 @@ export default function TodosPage() {
 
   useEffect(() => {
     refetch();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [filters]);
+
+  // 分类下拉选项：从当前列表去重派生
+  const categories = useMemo(() => {
+    const set = new Set<string>();
+    for (const t of todos) {
+      if (t.category) set.add(t.category);
+    }
+    return Array.from(set);
+  }, [todos]);
 
   async function handleAdd(values: TodoFormValues) {
     try {
@@ -88,6 +109,11 @@ export default function TodosPage() {
         </div>
         {error && <p className="text-red-500 mb-2">{error}</p>}
         <TodoForm submitText="添加" onSubmit={handleAdd} />
+        <FilterBar
+          filters={filters}
+          categories={categories}
+          onChange={setFilters}
+        />
         <TodoList
           todos={todos}
           onToggle={handleToggle}

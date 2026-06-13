@@ -26,8 +26,28 @@ async function handle<T>(res: Response): Promise<T> {
 
 // --- todos ---
 
-export async function fetchTodos(): Promise<Todo[]> {
-  return handle<Todo[]>(await authedFetch(TODOS));
+export interface Filters {
+  done: 'all' | 'active' | 'done';
+  category: string;
+  priority: '' | '1' | '2' | '3';
+  due: '' | 'today' | 'week' | 'overdue' | 'none';
+  q: string;
+}
+
+function buildQueryString(f: Filters): string {
+  const params = new URLSearchParams();
+  if (f.done !== 'all') params.set('done', f.done);
+  if (f.category) params.set('category', f.category);
+  if (f.priority) params.set('priority', f.priority);
+  if (f.due) params.set('due', f.due);
+  if (f.q) params.set('q', f.q);
+  const s = params.toString();
+  return s ? `?${s}` : '';
+}
+
+export async function fetchTodos(filters?: Filters): Promise<Todo[]> {
+  const qs = filters ? buildQueryString(filters) : '';
+  return handle<Todo[]>(await authedFetch(`${TODOS}${qs}`));
 }
 
 export async function createTodo(input: {
