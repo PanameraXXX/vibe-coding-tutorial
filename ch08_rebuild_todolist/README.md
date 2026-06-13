@@ -1,10 +1,10 @@
-# ch09 · 用 AI 重建 TODO List
+# ch08 · 用 AI 重建 TODO List
 
 从空目录出发，跟着 Claude Code 一起把 ch05 的 TODO List 重建一遍，外加四个新亮点。教学主线是 **AI 协作流程**：每个阶段都跑一次完整的 brainstorm → spec → plan → TDD → 实现 → 验证 → commit 循环。
 
 ## 设计文档
 
-- 总设计：[`docs/superpowers/specs/2026-06-13-ch09-rebuild-todolist-design.md`](docs/superpowers/specs/2026-06-13-ch09-rebuild-todolist-design.md)
+- 总设计：[`docs/superpowers/specs/2026-06-13-ch08-rebuild-todolist-design.md`](docs/superpowers/specs/2026-06-13-ch08-rebuild-todolist-design.md)
 
 ## 阶段进度
 

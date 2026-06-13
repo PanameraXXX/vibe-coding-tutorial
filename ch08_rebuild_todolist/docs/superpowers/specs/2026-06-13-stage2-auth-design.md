@@ -1,10 +1,10 @@
-# ch09 · 阶段 2（登录 + 用户隔离）—— 设计文档
+# ch08 · 阶段 2（登录 + 用户隔离）—— 设计文档
 
 - 日期：2026-06-13
 - 作者：Jack（与 Claude Code 协作）
-- 章节：ch09_rebuild_todolist · 阶段 2
+- 章节：ch08_rebuild_todolist · 阶段 2
 - 状态：设计已确认，待写实现 plan
-- 上游 spec：[2026-06-13-ch09-rebuild-todolist-design.md](./2026-06-13-ch09-rebuild-todolist-design.md)
+- 上游 spec：[2026-06-13-ch08-rebuild-todolist-design.md](./2026-06-13-ch08-rebuild-todolist-design.md)
 - 前置阶段：[2026-06-13-stage1-mvp-design.md](./2026-06-13-stage1-mvp-design.md)
 
 ---

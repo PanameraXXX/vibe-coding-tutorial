@@ -1,8 +1,8 @@
-# ch09 · 用 AI 重建 TODO List —— 设计文档
+# ch08 · 用 AI 重建 TODO List —— 设计文档
 
 - 日期：2026-06-13
 - 作者：Jack（与 Claude Code 协作）
-- 章节：ch09_rebuild_todolist
+- 章节：ch08_rebuild_todolist
 - 状态：设计已确认，待写实现 plan
 
 ---
@@ -30,12 +30,12 @@
 ## 2. 目录结构
 
 ```
-ch09_rebuild_todolist/
+ch08_rebuild_todolist/
 ├── README.md                      # 章节导览（每阶段进度表 + 链接）
 ├── docs/
 │   └── superpowers/
 │       └── specs/
-│           ├── 2026-06-13-ch09-rebuild-todolist-design.md   # 本文件
+│           ├── 2026-06-13-ch08-rebuild-todolist-design.md   # 本文件
 │           ├── 2026-06-13-stage1-mvp-design.md
 │           ├── 2026-06-13-stage1-mvp-plan.md
 │           └── ... (每阶段一对 design/plan)
@@ -186,7 +186,7 @@ DELETE /api/tags/:id
 | 后端 services | vitest | 业务逻辑全覆盖（增删改查、过滤、排序、权限） |
 | 后端 routes | vitest + supertest | 关键路径（鉴权、错误码、参数校验） |
 | 后端 db | 不直接测 | 通过 services 间接覆盖 |
-| 前端组件 | 不强制 | ch06 已讲过测试；ch09 不增前端测试负担 |
+| 前端组件 | 不强制 | ch06 已讲过测试；ch08 不增前端测试负担 |
 
 前端验证靠手动启动 dev server 跑一跑。
 
@@ -200,7 +200,7 @@ DELETE /api/tags/:id
 
 ## 8. 范围之外（YAGNI）
 
-ch09 **不**包含以下内容，避免冲淡「AI 协作流程」主线：
+ch08 **不**包含以下内容，避免冲淡「AI 协作流程」主线：
 
 - 前端组件单元测试（留给 ch06 风格的延伸）
 - 数据库迁移工具（如 Prisma / Drizzle）

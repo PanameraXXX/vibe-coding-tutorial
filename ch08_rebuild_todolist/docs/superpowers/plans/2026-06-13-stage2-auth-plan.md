@@ -1,4 +1,4 @@
-# ch09 阶段 2（登录 + 用户隔离）实现 Plan
+# ch08 阶段 2（登录 + 用户隔离）实现 Plan
 
 > **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
@@ -21,7 +21,7 @@
 ## 文件结构（阶段 2 结束后）
 
 ```
-ch09_rebuild_todolist/
+ch08_rebuild_todolist/
 ├── README.md                                  # 改：阶段 2 标 ✅，加 spec/plan 链接
 ├── docs/superpowers/
 │   ├── specs/2026-06-13-stage2-auth-design.md  (已存在)
@@ -89,14 +89,14 @@ ch09_rebuild_todolist/
 ## Task 1：后端装新依赖 + 改 schema 演进
 
 **Files:**
-- Modify: `ch09_rebuild_todolist/server/package.json`（通过 `npm i`）
-- Modify: `ch09_rebuild_todolist/server/src/types.ts`
-- Modify: `ch09_rebuild_todolist/server/src/db/schema.ts`
+- Modify: `ch08_rebuild_todolist/server/package.json`（通过 `npm i`）
+- Modify: `ch08_rebuild_todolist/server/src/types.ts`
+- Modify: `ch08_rebuild_todolist/server/src/db/schema.ts`
 
 - [ ] **Step 1：装依赖**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/server
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/server
 npm i bcryptjs express-session better-sqlite3-session-store
 npm i -D @types/bcryptjs @types/express-session
 ```
@@ -189,7 +189,7 @@ export function initSchema(db: Database.Database): void {
 - [ ] **Step 4：跑现有测试，确认仍能通过编译（services.todos / routes.todos 暂时还会失败，因为它们还没改造）**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/server
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/server
 npx tsc --noEmit
 ```
 
@@ -201,8 +201,8 @@ npx tsc --noEmit
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/package.json ch09_rebuild_todolist/server/package-lock.json ch09_rebuild_todolist/server/src/types.ts ch09_rebuild_todolist/server/src/db/schema.ts
-git commit -m "ch09 stage2: 装鉴权依赖 + schema 加 users 表与 todos.user_id"
+git add ch08_rebuild_todolist/server/package.json ch08_rebuild_todolist/server/package-lock.json ch08_rebuild_todolist/server/src/types.ts ch08_rebuild_todolist/server/src/db/schema.ts
+git commit -m "ch08 stage2: 装鉴权依赖 + schema 加 users 表与 todos.user_id"
 ```
 
 ---
@@ -210,8 +210,8 @@ git commit -m "ch09 stage2: 装鉴权依赖 + schema 加 users 表与 todos.user
 ## Task 2：services/users（TDD）
 
 **Files:**
-- Create: `ch09_rebuild_todolist/server/tests/services.users.test.ts`
-- Create: `ch09_rebuild_todolist/server/src/services/users.ts`
+- Create: `ch08_rebuild_todolist/server/tests/services.users.test.ts`
+- Create: `ch08_rebuild_todolist/server/src/services/users.ts`
 
 - [ ] **Step 1：写失败测试 `server/tests/services.users.test.ts`**
 
@@ -274,7 +274,7 @@ describe('users service', () => {
 - [ ] **Step 2：跑测试，确认「红」**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/server
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/server
 npm test
 ```
 
@@ -364,8 +364,8 @@ npm test
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/services/users.ts ch09_rebuild_todolist/server/tests/services.users.test.ts
-git commit -m "ch09 stage2: services/users（createUser / getUserByName / verifyPassword）"
+git add ch08_rebuild_todolist/server/src/services/users.ts ch08_rebuild_todolist/server/tests/services.users.test.ts
+git commit -m "ch08 stage2: services/users（createUser / getUserByName / verifyPassword）"
 ```
 
 ---
@@ -373,8 +373,8 @@ git commit -m "ch09 stage2: services/users（createUser / getUserByName / verify
 ## Task 3：services/todos 改造加 userId（TDD）
 
 **Files:**
-- Modify: `ch09_rebuild_todolist/server/src/services/todos.ts`
-- Modify: `ch09_rebuild_todolist/server/tests/services.todos.test.ts`
+- Modify: `ch08_rebuild_todolist/server/src/services/todos.ts`
+- Modify: `ch08_rebuild_todolist/server/tests/services.todos.test.ts`
 
 - [ ] **Step 1：替换 `server/tests/services.todos.test.ts` 全文**
 
@@ -568,8 +568,8 @@ npm test
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/services/todos.ts ch09_rebuild_todolist/server/tests/services.todos.test.ts
-git commit -m "ch09 stage2: services/todos 加 userId 隔离"
+git add ch08_rebuild_todolist/server/src/services/todos.ts ch08_rebuild_todolist/server/tests/services.todos.test.ts
+git commit -m "ch08 stage2: services/todos 加 userId 隔离"
 ```
 
 ---
@@ -577,12 +577,12 @@ git commit -m "ch09 stage2: services/todos 加 userId 隔离"
 ## Task 4：requireAuth 中间件
 
 **Files:**
-- Create: `ch09_rebuild_todolist/server/src/middleware/requireAuth.ts`
+- Create: `ch08_rebuild_todolist/server/src/middleware/requireAuth.ts`
 
 - [ ] **Step 1：创建目录**
 
 ```bash
-mkdir -p /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/server/src/middleware
+mkdir -p /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/server/src/middleware
 ```
 
 - [ ] **Step 2：写 `server/src/middleware/requireAuth.ts`**
@@ -603,7 +603,7 @@ export function requireAuth(req: Request, res: Response, next: NextFunction): vo
 - [ ] **Step 3：tsc 编译检查**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/server
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/server
 npx tsc --noEmit
 ```
 
@@ -613,8 +613,8 @@ npx tsc --noEmit
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/middleware/requireAuth.ts
-git commit -m "ch09 stage2: requireAuth 中间件"
+git add ch08_rebuild_todolist/server/src/middleware/requireAuth.ts
+git commit -m "ch08 stage2: requireAuth 中间件"
 ```
 
 ---
@@ -622,8 +622,8 @@ git commit -m "ch09 stage2: requireAuth 中间件"
 ## Task 5：routes/auth + 其测试（TDD via supertest agent）
 
 **Files:**
-- Create: `ch09_rebuild_todolist/server/src/routes/auth.ts`
-- Create: `ch09_rebuild_todolist/server/tests/routes.auth.test.ts`
+- Create: `ch08_rebuild_todolist/server/src/routes/auth.ts`
+- Create: `ch08_rebuild_todolist/server/tests/routes.auth.test.ts`
 
 > 这一步要先动 `app.ts` 装上 session 与 auth 路由，否则 supertest 跑不通。我们这里用一个**临时的 createApp 改造**先支撑测试，正式装配收尾在 Task 7。
 
@@ -774,7 +774,7 @@ describe('auth routes', () => {
 - [ ] **Step 3：跑测试，确认「红」**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/server
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/server
 npm test
 ```
 
@@ -869,8 +869,8 @@ npm test
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/app.ts ch09_rebuild_todolist/server/src/routes/auth.ts ch09_rebuild_todolist/server/tests/routes.auth.test.ts
-git commit -m "ch09 stage2: routes/auth + app.ts 装 session"
+git add ch08_rebuild_todolist/server/src/app.ts ch08_rebuild_todolist/server/src/routes/auth.ts ch08_rebuild_todolist/server/tests/routes.auth.test.ts
+git commit -m "ch08 stage2: routes/auth + app.ts 装 session"
 ```
 
 ---
@@ -878,8 +878,8 @@ git commit -m "ch09 stage2: routes/auth + app.ts 装 session"
 ## Task 6：routes/todos 改造（TDD via supertest agent）
 
 **Files:**
-- Modify: `ch09_rebuild_todolist/server/src/routes/todos.ts`
-- Modify: `ch09_rebuild_todolist/server/tests/routes.todos.test.ts`
+- Modify: `ch08_rebuild_todolist/server/src/routes/todos.ts`
+- Modify: `ch08_rebuild_todolist/server/tests/routes.todos.test.ts`
 
 - [ ] **Step 1：替换 `server/tests/routes.todos.test.ts` 全文**
 
@@ -1079,8 +1079,8 @@ npm test
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/routes/todos.ts ch09_rebuild_todolist/server/tests/routes.todos.test.ts
-git commit -m "ch09 stage2: routes/todos 接 session.userId + 跨用户 404 用例"
+git add ch08_rebuild_todolist/server/src/routes/todos.ts ch08_rebuild_todolist/server/tests/routes.todos.test.ts
+git commit -m "ch08 stage2: routes/todos 接 session.userId + 跨用户 404 用例"
 ```
 
 ---
@@ -1093,7 +1093,7 @@ git commit -m "ch09 stage2: routes/todos 接 session.userId + 跨用户 404 用�
 - [ ] **Step 1：清掉阶段 1 的 SQLite 老库（避免演示数据混进来）**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/server
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/server
 rm -f data/todolist.sqlite data/todolist.sqlite-wal data/todolist.sqlite-shm data/todolist.sqlite-journal
 ```
 
@@ -1144,14 +1144,14 @@ curl -s -b /tmp/c2 -c /tmp/c2 http://localhost:3001/api/todos
 ## Task 8：前端引 react-router-dom + 拆 main / App 框架
 
 **Files:**
-- Modify: `ch09_rebuild_todolist/client/package.json`（通过 `npm i`）
-- Modify: `ch09_rebuild_todolist/client/src/main.tsx`
-- Modify: `ch09_rebuild_todolist/client/src/App.tsx`
+- Modify: `ch08_rebuild_todolist/client/package.json`（通过 `npm i`）
+- Modify: `ch08_rebuild_todolist/client/src/main.tsx`
+- Modify: `ch08_rebuild_todolist/client/src/App.tsx`
 
 - [ ] **Step 1：装 react-router-dom**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/client
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/client
 npm i react-router-dom
 ```
 
@@ -1192,7 +1192,7 @@ export default function App() {
 - [ ] **Step 4：tsc 检查**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/client
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/client
 npx tsc --noEmit
 ```
 
@@ -1202,8 +1202,8 @@ npx tsc --noEmit
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/client/package.json ch09_rebuild_todolist/client/package-lock.json ch09_rebuild_todolist/client/src/main.tsx ch09_rebuild_todolist/client/src/App.tsx
-git commit -m "ch09 stage2: 前端引 react-router-dom + 路由占位"
+git add ch08_rebuild_todolist/client/package.json ch08_rebuild_todolist/client/package-lock.json ch08_rebuild_todolist/client/src/main.tsx ch08_rebuild_todolist/client/src/App.tsx
+git commit -m "ch08 stage2: 前端引 react-router-dom + 路由占位"
 ```
 
 ---
@@ -1211,8 +1211,8 @@ git commit -m "ch09 stage2: 前端引 react-router-dom + 路由占位"
 ## Task 9：前端 api.ts 加 authedFetch + auth 函数
 
 **Files:**
-- Modify: `ch09_rebuild_todolist/client/src/types.ts`
-- Modify: `ch09_rebuild_todolist/client/src/api.ts`
+- Modify: `ch08_rebuild_todolist/client/src/types.ts`
+- Modify: `ch08_rebuild_todolist/client/src/api.ts`
 
 - [ ] **Step 1：替换 `client/src/types.ts` 全文**
 
@@ -1327,7 +1327,7 @@ export async function me(): Promise<User | null> {
 - [ ] **Step 3：tsc 检查**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/client
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/client
 npx tsc --noEmit
 ```
 
@@ -1337,8 +1337,8 @@ npx tsc --noEmit
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/client/src/types.ts ch09_rebuild_todolist/client/src/api.ts
-git commit -m "ch09 stage2: 前端 api.ts 加 authedFetch + auth 调用"
+git add ch08_rebuild_todolist/client/src/types.ts ch08_rebuild_todolist/client/src/api.ts
+git commit -m "ch08 stage2: 前端 api.ts 加 authedFetch + auth 调用"
 ```
 
 ---
@@ -1346,14 +1346,14 @@ git commit -m "ch09 stage2: 前端 api.ts 加 authedFetch + auth 调用"
 ## Task 10：AuthContext + RequireAuth
 
 **Files:**
-- Create: `ch09_rebuild_todolist/client/src/auth/AuthContext.tsx`
-- Create: `ch09_rebuild_todolist/client/src/auth/RequireAuth.tsx`
-- Modify: `ch09_rebuild_todolist/client/src/main.tsx`（包 AuthProvider）
+- Create: `ch08_rebuild_todolist/client/src/auth/AuthContext.tsx`
+- Create: `ch08_rebuild_todolist/client/src/auth/RequireAuth.tsx`
+- Modify: `ch08_rebuild_todolist/client/src/main.tsx`（包 AuthProvider）
 
 - [ ] **Step 1：创建目录**
 
 ```bash
-mkdir -p /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/client/src/auth
+mkdir -p /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/client/src/auth
 ```
 
 - [ ] **Step 2：写 `client/src/auth/AuthContext.tsx`**
@@ -1470,7 +1470,7 @@ ReactDOM.createRoot(document.getElementById('root')!).render(
 - [ ] **Step 5：tsc 检查**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/client
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/client
 npx tsc --noEmit
 ```
 
@@ -1480,8 +1480,8 @@ npx tsc --noEmit
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/client/src/auth ch09_rebuild_todolist/client/src/main.tsx
-git commit -m "ch09 stage2: 前端 AuthContext + RequireAuth"
+git add ch08_rebuild_todolist/client/src/auth ch08_rebuild_todolist/client/src/main.tsx
+git commit -m "ch08 stage2: 前端 AuthContext + RequireAuth"
 ```
 
 ---
@@ -1489,14 +1489,14 @@ git commit -m "ch09 stage2: 前端 AuthContext + RequireAuth"
 ## Task 11：LoginPage + TodosPage + App 路由接通
 
 **Files:**
-- Create: `ch09_rebuild_todolist/client/src/pages/LoginPage.tsx`
-- Create: `ch09_rebuild_todolist/client/src/pages/TodosPage.tsx`
-- Modify: `ch09_rebuild_todolist/client/src/App.tsx`
+- Create: `ch08_rebuild_todolist/client/src/pages/LoginPage.tsx`
+- Create: `ch08_rebuild_todolist/client/src/pages/TodosPage.tsx`
+- Modify: `ch08_rebuild_todolist/client/src/App.tsx`
 
 - [ ] **Step 1：创建目录**
 
 ```bash
-mkdir -p /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/client/src/pages
+mkdir -p /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/client/src/pages
 ```
 
 - [ ] **Step 2：写 `client/src/pages/LoginPage.tsx`**
@@ -1716,7 +1716,7 @@ export default function App() {
 - [ ] **Step 5：tsc 检查**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/client
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/client
 npx tsc --noEmit
 ```
 
@@ -1728,13 +1728,13 @@ npx tsc --noEmit
 
 ```bash
 # 终端 1
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/server
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/server
 npm run dev
 ```
 
 ```bash
 # 终端 2
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/client
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/client
 npm run dev
 ```
 
@@ -1753,7 +1753,7 @@ npm run dev
 - [ ] **Step 7：跑一次后端测试，确保仍全绿**
 
 ```bash
-cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch09_rebuild_todolist/server
+cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial/ch08_rebuild_todolist/server
 npm test
 ```
 
@@ -1763,8 +1763,8 @@ npm test
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/client/src/pages ch09_rebuild_todolist/client/src/App.tsx
-git commit -m "ch09 stage2: LoginPage / TodosPage 接通登录态 + 路由守卫"
+git add ch08_rebuild_todolist/client/src/pages ch08_rebuild_todolist/client/src/App.tsx
+git commit -m "ch08 stage2: LoginPage / TodosPage 接通登录态 + 路由守卫"
 ```
 
 ---
@@ -1772,9 +1772,9 @@ git commit -m "ch09 stage2: LoginPage / TodosPage 接通登录态 + 路由守卫
 ## Task 12：README 阶段进度表更新
 
 **Files:**
-- Modify: `ch09_rebuild_todolist/README.md`
+- Modify: `ch08_rebuild_todolist/README.md`
 
-- [ ] **Step 1：把 `ch09_rebuild_todolist/README.md` 阶段进度表里第 2 行替换为**
+- [ ] **Step 1：把 `ch08_rebuild_todolist/README.md` 阶段进度表里第 2 行替换为**
 
 把这一行：
 
@@ -1792,8 +1792,8 @@ git commit -m "ch09 stage2: LoginPage / TodosPage 接通登录态 + 路由守卫
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/README.md
-git commit -m "ch09 stage2: README 阶段进度表标记阶段 2 完成"
+git add ch08_rebuild_todolist/README.md
+git commit -m "ch08 stage2: README 阶段进度表标记阶段 2 完成"
 ```
 
 ---
@@ -1802,7 +1802,7 @@ git commit -m "ch09 stage2: README 阶段进度表标记阶段 2 完成"
 
 走完上面所有 task 后，逐项核对：
 
-- [ ] `cd ch09_rebuild_todolist/server && npm test` → 全绿（≥30 条）
+- [ ] `cd ch08_rebuild_todolist/server && npm test` → 全绿（≥30 条）
 - [ ] 浏览器手动跑通：
   - 注册 alice → 自动登录 → 加 todo → 退出
   - 注册 bob → 加 todo → 看不到 alice 的

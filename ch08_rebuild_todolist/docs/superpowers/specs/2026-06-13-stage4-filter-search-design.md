@@ -1,6 +1,6 @@
 # 阶段 4 设计：过滤 + 搜索
 
-> 上游：[ch09 总设计](2026-06-13-ch09-rebuild-todolist-design.md) · [阶段 3 设计](2026-06-13-stage3-fields-design.md)
+> 上游：[ch08 总设计](2026-06-13-ch08-rebuild-todolist-design.md) · [阶段 3 设计](2026-06-13-stage3-fields-design.md)
 
 ## 目标
 
@@ -18,7 +18,7 @@
 - 后端单元测试 + 路由测试覆盖每个过滤维度与组合
 
 **不做：**
-- 前端单元测试（沿用 ch09 风格，前端靠浏览器 smoke）
+- 前端单元测试（沿用 ch08 风格，前端靠浏览器 smoke）
 - URL querystring 同步（刷新会丢失过滤态，教学场景可接受）
 - 全文搜索（仅 `title`，不搜 `category`/备注）
 - 自定义日期范围、防抖、分页

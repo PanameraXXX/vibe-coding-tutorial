@@ -1,10 +1,10 @@
-# ch09 · 阶段 1（MVP）—— 设计文档
+# ch08 · 阶段 1（MVP）—— 设计文档
 
 - 日期：2026-06-13
 - 作者：Jack（与 Claude Code 协作）
-- 章节：ch09_rebuild_todolist · 阶段 1
+- 章节：ch08_rebuild_todolist · 阶段 1
 - 状态：设计已确认，待写实现 plan
-- 上游 spec：[2026-06-13-ch09-rebuild-todolist-design.md](./2026-06-13-ch09-rebuild-todolist-design.md)
+- 上游 spec：[2026-06-13-ch08-rebuild-todolist-design.md](./2026-06-13-ch08-rebuild-todolist-design.md)
 
 ---
 
@@ -25,7 +25,7 @@
 - 分类 / 优先级 / 截止日期 → 阶段 3
 - 任何过滤、搜索、排序参数（`status` / `category` / `q` / `tag` 全无） → 阶段 4 起
 - 拖拽排序、tags、深色模式 → 阶段 5/6/7
-- 前端组件测试（参考上游 spec §7：ch09 不增前端测试负担）
+- 前端组件测试（参考上游 spec §7：ch08 不增前端测试负担）
 
 阶段 1 的目标是「跑起来 + 第一次完整 TDD 循环」，不是「功能多」。
 

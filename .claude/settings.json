@@ -1,5 +1,16 @@
 {
   "enabledPlugins": {
     "superpowers@superpowers-marketplace": true
-  }
+  },
+  "permissions": {                                          
+  "allow": [                                                                             
+    "Bash(npm test:*)",                                                              
+    "Bash(npm run *)",                            
+    "Bash(git add:*)",                                                                   
+    "Bash(git commit:*)",                                                            
+    "Edit",                                       
+    "Write",                                                                             
+    "Read"                                                                                                                          
+  ]                                               
+}   
 }

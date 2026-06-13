@@ -256,7 +256,7 @@ Expected: 3 PASS。
 
 ```bash
 git add server/src/types.ts server/src/db/schema.ts server/tests/db.schema.test.ts
-git commit -m "ch09 stage3: schema 加 category/priority/due_date 列 + 迁移"
+git commit -m "ch08 stage3: schema 加 category/priority/due_date 列 + 迁移"
 ```
 
 ---
@@ -418,7 +418,7 @@ Expected: 9 PASS。
 
 ```bash
 git add server/src/services/todos.ts server/tests/services.todos.test.ts
-git commit -m "ch09 stage3: services.todos 创建/查询支持新字段 + 排序"
+git commit -m "ch08 stage3: services.todos 创建/查询支持新字段 + 排序"
 ```
 
 ---
@@ -559,7 +559,7 @@ Expected: 12 PASS（原 7 + Task 3 加 2 + 本 task 加 3）。
 
 ```bash
 git add server/src/services/todos.ts server/tests/services.todos.test.ts
-git commit -m "ch09 stage3: services.todos.update 支持 null 清空 + 排序断言"
+git commit -m "ch08 stage3: services.todos.update 支持 null 清空 + 排序断言"
 ```
 
 ---
@@ -780,7 +780,7 @@ Expected: 全绿（约 31 + 5 + 4 + 3 = 43 用例左右）。如果有失败，�
 
 ```bash
 git add server/src/routes/todos.ts server/tests/routes.todos.test.ts
-git commit -m "ch09 stage3: routes.todos POST/PATCH 校验新字段"
+git commit -m "ch08 stage3: routes.todos POST/PATCH 校验新字段"
 ```
 
 ---
@@ -1269,7 +1269,7 @@ git add client/src/types.ts client/src/api.ts \
   client/src/components/TodoList.tsx \
   client/src/pages/TodosPage.tsx
 git rm client/src/components/TodoInput.tsx
-git commit -m "ch09 stage3: 前端加 TodoForm + TodoItem 两行视图 + 写操作 refetch"
+git commit -m "ch08 stage3: 前端加 TodoForm + TodoItem 两行视图 + 写操作 refetch"
 ```
 
 ---
@@ -1277,7 +1277,7 @@ git commit -m "ch09 stage3: 前端加 TodoForm + TodoItem 两行视图 + 写操�
 ## Task 10: 手动 smoke + 收尾
 
 **Files:**
-- Modify: `ch09_rebuild_todolist/README.md`
+- Modify: `ch08_rebuild_todolist/README.md`
 
 - [ ] **Step 1: 起后端**
 
@@ -1316,7 +1316,7 @@ Expected: 全绿。
 
 - [ ] **Step 6: 更新 README 阶段进度表**
 
-把 `ch09_rebuild_todolist/README.md` 中的阶段 3 行替换为：
+把 `ch08_rebuild_todolist/README.md` 中的阶段 3 行替换为：
 
 ```markdown
 | 3 | 分类 + 优先级 + 截止日期 | ✅ 完成 | [link](docs/superpowers/specs/2026-06-13-stage3-fields-design.md) | [link](docs/superpowers/plans/2026-06-13-stage3-fields-plan.md) |
@@ -1325,8 +1325,8 @@ Expected: 全绿。
 - [ ] **Step 7: commit**
 
 ```bash
-git add ch09_rebuild_todolist/README.md
-git commit -m "ch09 stage3: README 阶段进度更新到完成"
+git add ch08_rebuild_todolist/README.md
+git commit -m "ch08 stage3: README 阶段进度更新到完成"
 ```
 
 ---

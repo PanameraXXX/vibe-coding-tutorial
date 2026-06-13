@@ -80,7 +80,7 @@ Expected: 全部测试 PASS（重构不改语义）。
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/types.ts ch09_rebuild_todolist/server/src/services/todos.ts
+git add ch08_rebuild_todolist/server/src/types.ts ch08_rebuild_todolist/server/src/services/todos.ts
 git commit -m "refactor(stage4): 抽 ORDER_BY 常量，准备 filters"
 ```
 
@@ -165,7 +165,7 @@ Expected: 全部 PASS。
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/services/todos.ts ch09_rebuild_todolist/server/tests/services.todos.test.ts
+git add ch08_rebuild_todolist/server/src/services/todos.ts ch08_rebuild_todolist/server/tests/services.todos.test.ts
 git commit -m "feat(stage4): listTodos 支持 done 过滤"
 ```
 
@@ -232,7 +232,7 @@ Expected: 2 PASS。
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/services/todos.ts ch09_rebuild_todolist/server/tests/services.todos.test.ts
+git add ch08_rebuild_todolist/server/src/services/todos.ts ch08_rebuild_todolist/server/tests/services.todos.test.ts
 git commit -m "feat(stage4): listTodos 支持 category/priority 过滤"
 ```
 
@@ -364,7 +364,7 @@ Expected: 4 PASS。
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/services/todos.ts ch09_rebuild_todolist/server/tests/services.todos.test.ts
+git add ch08_rebuild_todolist/server/src/services/todos.ts ch08_rebuild_todolist/server/tests/services.todos.test.ts
 git commit -m "feat(stage4): listTodos 支持 due 四桶过滤（today/week/overdue/none）"
 ```
 
@@ -434,7 +434,7 @@ Expected: 2 PASS。
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/services/todos.ts ch09_rebuild_todolist/server/tests/services.todos.test.ts
+git add ch08_rebuild_todolist/server/src/services/todos.ts ch08_rebuild_todolist/server/tests/services.todos.test.ts
 git commit -m "feat(stage4): listTodos 支持 q 标题模糊搜索"
 ```
 
@@ -490,7 +490,7 @@ Expected: 全部 PASS。
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/tests/services.todos.test.ts
+git add ch08_rebuild_todolist/server/tests/services.todos.test.ts
 git commit -m "test(stage4): listTodos 多条件 AND 与用户隔离覆盖"
 ```
 
@@ -636,7 +636,7 @@ Expected: 全部 PASS。
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/server/src/routes/todos.ts ch09_rebuild_todolist/server/tests/routes.todos.test.ts
+git add ch08_rebuild_todolist/server/src/routes/todos.ts ch08_rebuild_todolist/server/tests/routes.todos.test.ts
 git commit -m "feat(stage4): GET /api/todos 接受 done/category/priority/due/q 五个 query"
 ```
 
@@ -973,7 +973,7 @@ Run: `cd client && npm run dev`
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/client/src/api.ts ch09_rebuild_todolist/client/src/components/FilterBar.tsx ch09_rebuild_todolist/client/src/pages/TodosPage.tsx
+git add ch08_rebuild_todolist/client/src/api.ts ch08_rebuild_todolist/client/src/components/FilterBar.tsx ch08_rebuild_todolist/client/src/pages/TodosPage.tsx
 git commit -m "feat(stage4): 前端 FilterBar + TodosPage 接入 filters"
 ```
 
@@ -982,11 +982,11 @@ git commit -m "feat(stage4): 前端 FilterBar + TodosPage 接入 filters"
 ## Task 11: 更新 README 阶段表
 
 **Files:**
-- Modify: `ch09_rebuild_todolist/README.md`
+- Modify: `ch08_rebuild_todolist/README.md`
 
 - [ ] **Step 1: 把阶段 4 行从 ⏳ 改成 ✅**
 
-打开 `ch09_rebuild_todolist/README.md`，把这一行：
+打开 `ch08_rebuild_todolist/README.md`，把这一行：
 
 ```markdown
 | 4 | 过滤 + 搜索 | ⏳ 待开始 | — | — |
@@ -1002,8 +1002,8 @@ git commit -m "feat(stage4): 前端 FilterBar + TodosPage 接入 filters"
 
 ```bash
 cd /Users/xujian/Documents/OldSchoolProgramming/vibe_coding_tutorial
-git add ch09_rebuild_todolist/README.md
-git commit -m "docs(ch09): 阶段 4 完成"
+git add ch08_rebuild_todolist/README.md
+git commit -m "docs(ch08): 阶段 4 完成"
 ```
 
 ---
