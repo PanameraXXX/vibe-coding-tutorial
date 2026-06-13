@@ -1,14 +1,15 @@
 import type { Todo } from '../types';
 import { TodoItem } from './TodoItem';
+import type { TodoFormValues } from './TodoForm';
 
 interface Props {
   todos: Todo[];
   onToggle: (id: number, done: boolean) => void;
-  onEdit: (id: number, title: string) => void;
+  onUpdate: (id: number, patch: TodoFormValues) => void;
   onDelete: (id: number) => void;
 }
 
-export function TodoList({ todos, onToggle, onEdit, onDelete }: Props) {
+export function TodoList({ todos, onToggle, onUpdate, onDelete }: Props) {
   if (todos.length === 0) {
     return <p className="text-gray-400 text-center py-8">还没有待办</p>;
   }
@@ -19,7 +20,7 @@ export function TodoList({ todos, onToggle, onEdit, onDelete }: Props) {
           key={t.id}
           todo={t}
           onToggle={onToggle}
-          onEdit={onEdit}
+          onUpdate={onUpdate}
           onDelete={onDelete}
         />
       ))}

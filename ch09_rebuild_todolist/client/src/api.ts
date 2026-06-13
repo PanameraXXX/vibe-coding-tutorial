@@ -30,20 +30,30 @@ export async function fetchTodos(): Promise<Todo[]> {
   return handle<Todo[]>(await authedFetch(TODOS));
 }
 
-export async function createTodo(title: string): Promise<Todo> {
+export async function createTodo(input: {
+  title: string;
+  category?: string | null;
+  priority?: 1 | 2 | 3 | null;
+  dueDate?: string | null;
+}): Promise<Todo> {
   return handle<Todo>(
     await authedFetch(TODOS, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ title }),
+      body: JSON.stringify(input),
     })
   );
 }
 
-export async function updateTodo(
-  id: number,
-  patch: Partial<Pick<Todo, 'title' | 'done'>>
-): Promise<Todo> {
+export type UpdateTodoPatch = {
+  title?: string;
+  done?: boolean;
+  category?: string | null;
+  priority?: 1 | 2 | 3 | null;
+  dueDate?: string | null;
+};
+
+export async function updateTodo(id: number, patch: UpdateTodoPatch): Promise<Todo> {
   return handle<Todo>(
     await authedFetch(`${TODOS}/${id}`, {
       method: 'PATCH',

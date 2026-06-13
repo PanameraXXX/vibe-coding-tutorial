@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import type { Todo } from '../types';
 import * as api from '../api';
 import { useAuth } from '../auth/AuthContext';
-import { TodoInput } from '../components/TodoInput';
+import { TodoForm, type TodoFormValues } from '../components/TodoForm';
 import { TodoList } from '../components/TodoList';
 
 export default function TodosPage() {
@@ -12,14 +12,24 @@ export default function TodosPage() {
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
 
+  // 写操作完成后刷新整个列表，保证排序与最新值一致
+  async function refetch() {
+    try {
+      const list = await api.fetchTodos();
+      setTodos(list);
+    } catch (e) {
+      setError(e instanceof Error ? e.message : String(e));
+    }
+  }
+
   useEffect(() => {
-    api.fetchTodos().then(setTodos).catch((e) => setError(String(e)));
+    refetch();
   }, []);
 
-  async function handleAdd(title: string) {
+  async function handleAdd(values: TodoFormValues) {
     try {
-      const t = await api.createTodo(title);
-      setTodos((prev) => [...prev, t]);
+      await api.createTodo(values);
+      await refetch();
     } catch (e) {
       console.error(e);
     }
@@ -27,17 +37,17 @@ export default function TodosPage() {
 
   async function handleToggle(id: number, done: boolean) {
     try {
-      const t = await api.updateTodo(id, { done });
-      setTodos((prev) => prev.map((x) => (x.id === id ? t : x)));
+      await api.updateTodo(id, { done });
+      await refetch();
     } catch (e) {
       console.error(e);
     }
   }
 
-  async function handleEdit(id: number, title: string) {
+  async function handleUpdate(id: number, patch: TodoFormValues) {
     try {
-      const t = await api.updateTodo(id, { title });
-      setTodos((prev) => prev.map((x) => (x.id === id ? t : x)));
+      await api.updateTodo(id, patch);
+      await refetch();
     } catch (e) {
       console.error(e);
     }
@@ -46,7 +56,7 @@ export default function TodosPage() {
   async function handleDelete(id: number) {
     try {
       await api.deleteTodo(id);
-      setTodos((prev) => prev.filter((x) => x.id !== id));
+      await refetch();
     } catch (e) {
       console.error(e);
     }
@@ -77,11 +87,11 @@ export default function TodosPage() {
           </div>
         </div>
         {error && <p className="text-red-500 mb-2">{error}</p>}
-        <TodoInput onAdd={handleAdd} />
+        <TodoForm submitText="添加" onSubmit={handleAdd} />
         <TodoList
           todos={todos}
           onToggle={handleToggle}
-          onEdit={handleEdit}
+          onUpdate={handleUpdate}
           onDelete={handleDelete}
         />
       </div>
