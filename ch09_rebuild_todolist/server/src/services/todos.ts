@@ -1,5 +1,5 @@
 import type Database from 'better-sqlite3';
-import type { Todo, CreateTodoInput, UpdateTodoInput } from '../types';
+import type { Todo, CreateTodoInput, UpdateTodoInput, ListFilters } from '../types';
 
 interface TodoRow {
   id: number;
@@ -58,12 +58,19 @@ export function createTodo(
   };
 }
 
-export function getAllTodos(db: Database.Database, userId: number): Todo[] {
-  const rows = db
-    .prepare(
-      `SELECT ${SELECT_COLUMNS} FROM todos WHERE user_id = ? ${ORDER_BY}`
-    )
-    .all(userId) as TodoRow[];
+export function getAllTodos(
+  db: Database.Database,
+  userId: number,
+  filters: ListFilters = {}
+): Todo[] {
+  const where: string[] = ['user_id = ?'];
+  const params: (string | number)[] = [userId];
+
+  if (filters.done === 'active') where.push('done = 0');
+  if (filters.done === 'done') where.push('done = 1');
+
+  const sql = `SELECT ${SELECT_COLUMNS} FROM todos WHERE ${where.join(' AND ')} ${ORDER_BY}`;
+  const rows = db.prepare(sql).all(...params) as TodoRow[];
   return rows.map(rowToTodo);
 }
 

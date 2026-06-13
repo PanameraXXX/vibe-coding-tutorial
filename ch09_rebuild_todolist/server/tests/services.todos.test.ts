@@ -159,4 +159,24 @@ describe('todos service', () => {
     expect(updated!.priority).toBe(2);
     expect(updated!.dueDate).toBe('2026-06-15');
   });
+
+  it("过滤：done='active' 只返回未完成", () => {
+    const { db, aliceId } = bootstrap();
+    const t1 = createTodo(db, aliceId, { title: 'a' });
+    const t2 = createTodo(db, aliceId, { title: 'b' });
+    updateTodo(db, aliceId, t2.id, { done: true });
+
+    const list = getAllTodos(db, aliceId, { done: 'active' });
+    expect(list.map((t) => t.id)).toEqual([t1.id]);
+  });
+
+  it("过滤：done='done' 只返回已完成", () => {
+    const { db, aliceId } = bootstrap();
+    createTodo(db, aliceId, { title: 'a' });
+    const t2 = createTodo(db, aliceId, { title: 'b' });
+    updateTodo(db, aliceId, t2.id, { done: true });
+
+    const list = getAllTodos(db, aliceId, { done: 'done' });
+    expect(list.map((t) => t.id)).toEqual([t2.id]);
+  });
 });
