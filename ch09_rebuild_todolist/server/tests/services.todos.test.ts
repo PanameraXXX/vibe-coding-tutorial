@@ -8,6 +8,16 @@ import {
 } from '../src/services/todos';
 import { createUser } from '../src/services/users';
 
+function localToday(): string {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+function offsetDate(n: number): string {
+  const d = new Date();
+  d.setDate(d.getDate() + n);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+}
+
 function bootstrap() {
   const db = createTestDb();
   const alice = createUser(db, { username: 'alice', password: 'pw' });
@@ -197,6 +207,48 @@ describe('todos service', () => {
     createTodo(db, aliceId, { title: 'c' });
 
     const list = getAllTodos(db, aliceId, { priority: 3 });
+    expect(list.map((t) => t.title)).toEqual(['a']);
+  });
+
+  it("过滤：due='today' 只命中今天", () => {
+    const { db, aliceId } = bootstrap();
+    createTodo(db, aliceId, { title: 't0', dueDate: localToday() });
+    createTodo(db, aliceId, { title: 't1', dueDate: offsetDate(1) });
+    createTodo(db, aliceId, { title: 't_1', dueDate: offsetDate(-1) });
+    createTodo(db, aliceId, { title: 'tnull' });
+
+    const list = getAllTodos(db, aliceId, { due: 'today' });
+    expect(list.map((t) => t.title)).toEqual(['t0']);
+  });
+
+  it("过滤：due='week' 命中今天起 7 天内（含端点）", () => {
+    const { db, aliceId } = bootstrap();
+    createTodo(db, aliceId, { title: 't0', dueDate: localToday() });
+    createTodo(db, aliceId, { title: 't6', dueDate: offsetDate(6) });
+    createTodo(db, aliceId, { title: 't7', dueDate: offsetDate(7) });
+    createTodo(db, aliceId, { title: 't_1', dueDate: offsetDate(-1) });
+
+    const list = getAllTodos(db, aliceId, { due: 'week' });
+    expect(list.map((t) => t.title).sort()).toEqual(['t0', 't6']);
+  });
+
+  it("过滤：due='overdue' 不含已完成的过期项", () => {
+    const { db, aliceId } = bootstrap();
+    const a = createTodo(db, aliceId, { title: 'a', dueDate: offsetDate(-1) });
+    const b = createTodo(db, aliceId, { title: 'b', dueDate: offsetDate(-2) });
+    updateTodo(db, aliceId, b.id, { done: true });
+    createTodo(db, aliceId, { title: 'c', dueDate: localToday() });
+
+    const list = getAllTodos(db, aliceId, { due: 'overdue' });
+    expect(list.map((t) => t.id)).toEqual([a.id]);
+  });
+
+  it("过滤：due='none' 命中 dueDate 为 null", () => {
+    const { db, aliceId } = bootstrap();
+    createTodo(db, aliceId, { title: 'a' });
+    createTodo(db, aliceId, { title: 'b', dueDate: offsetDate(1) });
+
+    const list = getAllTodos(db, aliceId, { due: 'none' });
     expect(list.map((t) => t.title)).toEqual(['a']);
   });
 });

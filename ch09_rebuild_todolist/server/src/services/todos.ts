@@ -32,6 +32,24 @@ const SELECT_COLUMNS =
 const ORDER_BY =
   'ORDER BY priority DESC NULLS LAST, due_date ASC NULLS LAST, id ASC';
 
+// 服务器本地日期 YYYY-MM-DD
+function today(): string {
+  const d = new Date();
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
+function addDays(date: string, n: number): string {
+  const d = new Date(date + 'T00:00:00');
+  d.setDate(d.getDate() + n);
+  const yyyy = d.getFullYear();
+  const mm = String(d.getMonth() + 1).padStart(2, '0');
+  const dd = String(d.getDate()).padStart(2, '0');
+  return `${yyyy}-${mm}-${dd}`;
+}
+
 export function createTodo(
   db: Database.Database,
   userId: number,
@@ -76,6 +94,22 @@ export function getAllTodos(
   if (filters.priority) {
     where.push('priority = ?');
     params.push(filters.priority);
+  }
+
+  if (filters.due === 'today') {
+    where.push('due_date = ?');
+    params.push(today());
+  }
+  if (filters.due === 'week') {
+    where.push('due_date BETWEEN ? AND ?');
+    params.push(today(), addDays(today(), 6));
+  }
+  if (filters.due === 'overdue') {
+    where.push('due_date < ? AND done = 0');
+    params.push(today());
+  }
+  if (filters.due === 'none') {
+    where.push('due_date IS NULL');
   }
 
   const sql = `SELECT ${SELECT_COLUMNS} FROM todos WHERE ${where.join(' AND ')} ${ORDER_BY}`;
