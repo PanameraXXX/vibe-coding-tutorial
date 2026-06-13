@@ -11,7 +11,7 @@
 | # | 阶段 | 状态 | Spec | Plan |
 |---|---|---|---|---|
 | 1 | MVP（CRUD + 持久化） | ✅ 完成 | [link](docs/superpowers/specs/2026-06-13-stage1-mvp-design.md) | [link](docs/superpowers/plans/2026-06-13-stage1-mvp-plan.md) |
-| 2 | 登录 + 用户隔离 | ⏳ 待开始 | — | — |
+| 2 | 登录 + 用户隔离 | ✅ 完成 | [link](docs/superpowers/specs/2026-06-13-stage2-auth-design.md) | [link](docs/superpowers/plans/2026-06-13-stage2-auth-plan.md) |
 | 3 | 分类 + 优先级 + 截止日期 | ⏳ 待开始 | — | — |
 | 4 | 过滤 + 搜索 | ⏳ 待开始 | — | — |
 | 5 | 拖拽排序 | ⏳ 待开始 | — | — |
