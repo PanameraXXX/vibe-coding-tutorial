@@ -7,11 +7,16 @@ import {
   deleteTodo,
 } from '../services/todos';
 
+// 此处假定上游已经过 requireAuth 中间件，session.userId 一定存在
+function userId(req: Request): number {
+  return req.session.userId as number;
+}
+
 export function createTodosRouter(db: Database.Database): Router {
   const router = Router();
 
-  router.get('/', (_req: Request, res: Response) => {
-    res.json(getAllTodos(db));
+  router.get('/', (req: Request, res: Response) => {
+    res.json(getAllTodos(db, userId(req)));
   });
 
   router.post('/', (req: Request, res: Response) => {
@@ -20,7 +25,7 @@ export function createTodosRouter(db: Database.Database): Router {
       res.status(400).json({ error: 'title 必填' });
       return;
     }
-    const todo = createTodo(db, { title });
+    const todo = createTodo(db, userId(req), { title });
     res.status(201).json(todo);
   });
 
@@ -31,7 +36,7 @@ export function createTodosRouter(db: Database.Database): Router {
       return;
     }
     const { title, done } = req.body ?? {};
-    const updated = updateTodo(db, id, {
+    const updated = updateTodo(db, userId(req), id, {
       title: typeof title === 'string' ? title : undefined,
       done: typeof done === 'boolean' ? done : undefined,
     });
@@ -48,7 +53,7 @@ export function createTodosRouter(db: Database.Database): Router {
       res.status(400).json({ error: 'id 非法' });
       return;
     }
-    const ok = deleteTodo(db, id);
+    const ok = deleteTodo(db, userId(req), id);
     if (!ok) {
       res.status(404).json({ error: '未找到' });
       return;
