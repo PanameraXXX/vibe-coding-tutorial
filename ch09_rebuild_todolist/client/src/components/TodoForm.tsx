@@ -44,42 +44,40 @@ export function TodoForm({ initial, submitText, onSubmit, onCancel }: Props) {
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-2 mb-2">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
       <input
         className="border rounded px-3 py-2"
         placeholder="想做点什么..."
         value={title}
         onChange={(e) => setTitle(e.target.value)}
-        autoFocus={!!initial}
+        autoFocus
       />
-      <div className="flex gap-2">
+      <div className="flex flex-wrap gap-2 items-center">
         <input
-          className="flex-1 border rounded px-3 py-2"
+          className="flex-1 min-w-[8rem] border rounded px-2 py-1 text-sm"
           placeholder="分类（可选）"
           value={category}
           onChange={(e) => setCategory(e.target.value)}
         />
         <select
-          className="border rounded px-2 py-2"
+          className="border rounded px-2 py-1 text-sm bg-white"
           value={priority}
           onChange={(e) => setPriority(e.target.value as '' | '1' | '2' | '3')}
         >
           <option value="">优先级</option>
-          <option value="1">低</option>
-          <option value="2">中</option>
-          <option value="3">高</option>
+          <option value="1">🟢 低</option>
+          <option value="2">🟡 中</option>
+          <option value="3">🔴 高</option>
         </select>
         <input
           type="date"
-          className="border rounded px-2 py-2"
+          className="border rounded px-2 py-1 text-sm"
           value={dueDate}
           onChange={(e) => setDueDate(e.target.value)}
         />
-      </div>
-      <div className="flex gap-2">
         <button
           type="submit"
-          className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
+          className="bg-blue-600 text-white text-sm px-4 py-1 rounded hover:bg-blue-700"
         >
           {submitText}
         </button>
@@ -87,7 +85,7 @@ export function TodoForm({ initial, submitText, onSubmit, onCancel }: Props) {
           <button
             type="button"
             onClick={onCancel}
-            className="px-4 py-2 rounded border hover:bg-gray-100"
+            className="text-sm px-3 py-1 rounded border hover:bg-gray-100"
           >
             取消
           </button>

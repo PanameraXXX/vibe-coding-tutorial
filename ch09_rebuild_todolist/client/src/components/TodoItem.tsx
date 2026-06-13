@@ -31,7 +31,7 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
 
   if (editing) {
     return (
-      <li className="py-2 border-b last:border-b-0">
+      <li className="py-2 px-2 border-b last:border-b-0 bg-blue-50">
         <TodoForm
           initial={todo}
           submitText="保存"
@@ -46,53 +46,50 @@ export function TodoItem({ todo, onToggle, onUpdate, onDelete }: Props) {
   }
 
   const overdue = isOverdue(todo.dueDate, todo.done);
-  const showMeta = todo.category || todo.dueDate;
 
   return (
-    <li className="py-2 border-b last:border-b-0">
-      <div className="flex items-center gap-2">
-        <input
-          type="checkbox"
-          checked={todo.done}
-          onChange={(e) => onToggle(todo.id, e.target.checked)}
-        />
-        <span
-          className={`flex-1 ${todo.done ? 'line-through text-gray-400' : ''}`}
-        >
-          {todo.title}
+    <li className="group flex items-center gap-2 px-2 py-2 border-b last:border-b-0 hover:bg-gray-50">
+      <input
+        type="checkbox"
+        checked={todo.done}
+        onChange={(e) => onToggle(todo.id, e.target.checked)}
+      />
+      {todo.priority && (
+        <span className="text-sm" title={`优先级 ${todo.priority}`}>
+          {PRIORITY_EMOJI[todo.priority]}
         </span>
-        {todo.priority && (
-          <span title={`优先级 ${todo.priority}`}>
-            {PRIORITY_EMOJI[todo.priority]}
-          </span>
-        )}
-        <button
-          className="text-sm text-gray-500 hover:text-gray-800"
-          onClick={() => setEditing(true)}
-        >
-          编辑
-        </button>
-        <button
-          className="text-sm text-red-500 hover:text-red-700"
-          onClick={() => onDelete(todo.id)}
-        >
-          删除
-        </button>
-      </div>
-      {showMeta && (
-        <div className="flex items-center gap-2 pl-6 mt-1 text-xs">
-          {todo.category && (
-            <span className="bg-gray-100 text-gray-600 px-2 py-0.5 rounded-full">
-              {todo.category}
-            </span>
-          )}
-          {todo.dueDate && (
-            <span className={overdue ? 'text-red-500' : 'text-gray-500'}>
-              ⏰ {todo.dueDate}
-            </span>
-          )}
-        </div>
       )}
+      <span
+        className={`flex-1 truncate ${todo.done ? 'line-through text-gray-400' : ''}`}
+      >
+        {todo.title}
+      </span>
+      {todo.category && (
+        <span className="bg-gray-100 text-gray-600 text-xs px-2 py-0.5 rounded-full whitespace-nowrap">
+          {todo.category}
+        </span>
+      )}
+      {todo.dueDate && (
+        <span
+          className={`text-xs whitespace-nowrap ${overdue ? 'text-red-500' : 'text-gray-500'}`}
+        >
+          ⏰ {todo.dueDate}
+        </span>
+      )}
+      <button
+        className="text-gray-400 hover:text-blue-600 opacity-0 group-hover:opacity-100 transition-opacity"
+        title="编辑"
+        onClick={() => setEditing(true)}
+      >
+        ✏️
+      </button>
+      <button
+        className="text-gray-400 hover:text-red-600 opacity-0 group-hover:opacity-100 transition-opacity"
+        title="删除"
+        onClick={() => onDelete(todo.id)}
+      >
+        🗑️
+      </button>
     </li>
   );
 }
