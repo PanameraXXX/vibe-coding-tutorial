@@ -80,4 +80,30 @@ describe('todos service', () => {
     expect(getAllTodos(db, aliceId)).toHaveLength(1);
     expect(getAllTodos(db, aliceId)[0].done).toBe(false);
   });
+
+  it('create：可带 category/priority/dueDate', () => {
+    const { db, aliceId } = bootstrap();
+    const t = createTodo(db, aliceId, {
+      title: '写课件',
+      category: '工作',
+      priority: 3,
+      dueDate: '2026-06-20',
+    });
+    expect(t.category).toBe('工作');
+    expect(t.priority).toBe(3);
+    expect(t.dueDate).toBe('2026-06-20');
+
+    const all = getAllTodos(db, aliceId);
+    expect(all[0].category).toBe('工作');
+    expect(all[0].priority).toBe(3);
+    expect(all[0].dueDate).toBe('2026-06-20');
+  });
+
+  it('create：不传新字段则三列均为 null', () => {
+    const { db, aliceId } = bootstrap();
+    const t = createTodo(db, aliceId, { title: '裸标题' });
+    expect(t.category).toBeNull();
+    expect(t.priority).toBeNull();
+    expect(t.dueDate).toBeNull();
+  });
 });

@@ -6,6 +6,9 @@ interface TodoRow {
   title: string;
   done: number;
   created_at: string;
+  category: string | null;
+  priority: number | null;
+  due_date: string | null;
 }
 
 function rowToTodo(row: TodoRow): Todo {
@@ -14,8 +17,17 @@ function rowToTodo(row: TodoRow): Todo {
     title: row.title,
     done: row.done === 1,
     createdAt: row.created_at,
+    category: row.category,
+    priority:
+      row.priority === 1 || row.priority === 2 || row.priority === 3
+        ? row.priority
+        : null,
+    dueDate: row.due_date,
   };
 }
+
+const SELECT_COLUMNS =
+  'id, title, done, created_at, category, priority, due_date';
 
 export function createTodo(
   db: Database.Database,
@@ -23,23 +35,31 @@ export function createTodo(
   input: CreateTodoInput
 ): Todo {
   const createdAt = new Date().toISOString();
+  const category = input.category ?? null;
+  const priority = input.priority ?? null;
+  const dueDate = input.dueDate ?? null;
   const info = db
     .prepare(
-      'INSERT INTO todos (title, done, created_at, user_id) VALUES (?, 0, ?, ?)'
+      'INSERT INTO todos (title, done, created_at, user_id, category, priority, due_date) VALUES (?, 0, ?, ?, ?, ?, ?)'
     )
-    .run(input.title, createdAt, userId);
+    .run(input.title, createdAt, userId, category, priority, dueDate);
   return {
     id: Number(info.lastInsertRowid),
     title: input.title,
     done: false,
     createdAt,
+    category,
+    priority:
+      priority === 1 || priority === 2 || priority === 3 ? priority : null,
+    dueDate,
   };
 }
 
 export function getAllTodos(db: Database.Database, userId: number): Todo[] {
   const rows = db
     .prepare(
-      'SELECT id, title, done, created_at FROM todos WHERE user_id = ? ORDER BY id ASC'
+      `SELECT ${SELECT_COLUMNS} FROM todos WHERE user_id = ? ` +
+        `ORDER BY priority DESC NULLS LAST, due_date ASC NULLS LAST, id ASC`
     )
     .all(userId) as TodoRow[];
   return rows.map(rowToTodo);
@@ -53,7 +73,7 @@ export function updateTodo(
 ): Todo | null {
   const existing = db
     .prepare(
-      'SELECT id, title, done, created_at FROM todos WHERE id = ? AND user_id = ?'
+      `SELECT ${SELECT_COLUMNS} FROM todos WHERE id = ? AND user_id = ?`
     )
     .get(id, userId) as TodoRow | undefined;
   if (!existing) return null;
