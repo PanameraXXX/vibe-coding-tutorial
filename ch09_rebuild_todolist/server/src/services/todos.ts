@@ -29,6 +29,9 @@ function rowToTodo(row: TodoRow): Todo {
 const SELECT_COLUMNS =
   'id, title, done, created_at, category, priority, due_date';
 
+const ORDER_BY =
+  'ORDER BY priority DESC NULLS LAST, due_date ASC NULLS LAST, id ASC';
+
 export function createTodo(
   db: Database.Database,
   userId: number,
@@ -58,8 +61,7 @@ export function createTodo(
 export function getAllTodos(db: Database.Database, userId: number): Todo[] {
   const rows = db
     .prepare(
-      `SELECT ${SELECT_COLUMNS} FROM todos WHERE user_id = ? ` +
-        `ORDER BY priority DESC NULLS LAST, due_date ASC NULLS LAST, id ASC`
+      `SELECT ${SELECT_COLUMNS} FROM todos WHERE user_id = ? ${ORDER_BY}`
     )
     .all(userId) as TodoRow[];
   return rows.map(rowToTodo);

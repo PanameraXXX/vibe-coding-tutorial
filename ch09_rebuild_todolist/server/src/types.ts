@@ -43,3 +43,12 @@ declare module 'express-session' {
     userId: number;
   }
 }
+
+// 列表过滤参数
+export interface ListFilters {
+  done?: 'active' | 'done';
+  category?: string;
+  priority?: 1 | 2 | 3;
+  due?: 'today' | 'week' | 'overdue' | 'none';
+  q?: string;
+}
