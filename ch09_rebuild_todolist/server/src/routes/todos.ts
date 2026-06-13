@@ -12,6 +12,32 @@ function userId(req: Request): number {
   return req.session.userId as number;
 }
 
+const ISO_DATE = /^\d{4}-\d{2}-\d{2}$/;
+
+// 校验：允许 undefined（不传）/ null（清空）/ 合法值
+type Validated<T> = { ok: true; value: T } | { ok: false };
+
+function validatePriority(v: unknown): Validated<1 | 2 | 3 | null | undefined> {
+  if (v === undefined) return { ok: true, value: undefined };
+  if (v === null) return { ok: true, value: null };
+  if (v === 1 || v === 2 || v === 3) return { ok: true, value: v };
+  return { ok: false };
+}
+
+function validateDueDate(v: unknown): Validated<string | null | undefined> {
+  if (v === undefined) return { ok: true, value: undefined };
+  if (v === null) return { ok: true, value: null };
+  if (typeof v === 'string' && ISO_DATE.test(v)) return { ok: true, value: v };
+  return { ok: false };
+}
+
+function validateCategory(v: unknown): Validated<string | null | undefined> {
+  if (v === undefined) return { ok: true, value: undefined };
+  if (v === null) return { ok: true, value: null };
+  if (typeof v === 'string') return { ok: true, value: v };
+  return { ok: false };
+}
+
 export function createTodosRouter(db: Database.Database): Router {
   const router = Router();
 
@@ -25,7 +51,27 @@ export function createTodosRouter(db: Database.Database): Router {
       res.status(400).json({ error: 'title 必填' });
       return;
     }
-    const todo = createTodo(db, userId(req), { title });
+    const cat = validateCategory(req.body?.category);
+    const pri = validatePriority(req.body?.priority);
+    const due = validateDueDate(req.body?.dueDate);
+    if (!cat.ok) {
+      res.status(400).json({ error: 'category 非法' });
+      return;
+    }
+    if (!pri.ok) {
+      res.status(400).json({ error: 'priority 必须是 1/2/3' });
+      return;
+    }
+    if (!due.ok) {
+      res.status(400).json({ error: 'dueDate 必须是 YYYY-MM-DD' });
+      return;
+    }
+    const todo = createTodo(db, userId(req), {
+      title,
+      category: cat.value,
+      priority: pri.value,
+      dueDate: due.value,
+    });
     res.status(201).json(todo);
   });
 
@@ -35,10 +81,29 @@ export function createTodosRouter(db: Database.Database): Router {
       res.status(400).json({ error: 'id 非法' });
       return;
     }
-    const { title, done } = req.body ?? {};
+    const body = req.body ?? {};
+    const cat = validateCategory(body.category);
+    const pri = validatePriority(body.priority);
+    const due = validateDueDate(body.dueDate);
+    if (!cat.ok) {
+      res.status(400).json({ error: 'category 非法' });
+      return;
+    }
+    if (!pri.ok) {
+      res.status(400).json({ error: 'priority 必须是 1/2/3' });
+      return;
+    }
+    if (!due.ok) {
+      res.status(400).json({ error: 'dueDate 必须是 YYYY-MM-DD' });
+      return;
+    }
+
     const updated = updateTodo(db, userId(req), id, {
-      title: typeof title === 'string' ? title : undefined,
-      done: typeof done === 'boolean' ? done : undefined,
+      title: typeof body.title === 'string' ? body.title : undefined,
+      done: typeof body.done === 'boolean' ? body.done : undefined,
+      category: cat.value,
+      priority: pri.value,
+      dueDate: due.value,
     });
     if (!updated) {
       res.status(404).json({ error: '未找到' });
