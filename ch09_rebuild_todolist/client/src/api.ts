@@ -10,8 +10,15 @@ function authedFetch(url: string, init?: RequestInit) {
 
 async function handle<T>(res: Response): Promise<T> {
   if (!res.ok) {
-    const text = await res.text();
-    throw new Error(`HTTP ${res.status}: ${text}`);
+    // 优先用后端返回的 { error } 字段；解析失败再退回到 statusText
+    let message = res.statusText || `请求失败（${res.status}）`;
+    try {
+      const data = await res.json();
+      if (data && typeof data.error === 'string') message = data.error;
+    } catch {
+      // 非 JSON 响应，保持兜底文案
+    }
+    throw new Error(message);
   }
   if (res.status === 204) return undefined as T;
   return res.json() as Promise<T>;
