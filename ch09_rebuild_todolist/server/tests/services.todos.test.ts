@@ -269,4 +269,29 @@ describe('todos service', () => {
     const list = getAllTodos(db, aliceId, { q: '50%' });
     expect(list.map((t) => t.title)).toEqual(['完成 50% 进度']);
   });
+
+  it("过滤：done + priority + q 多条件 AND", () => {
+    const { db, aliceId } = bootstrap();
+    const a = createTodo(db, aliceId, { title: '写课件 A', priority: 3 });
+    const b = createTodo(db, aliceId, { title: '写课件 B', priority: 3 });
+    updateTodo(db, aliceId, b.id, { done: true });
+    createTodo(db, aliceId, { title: '写课件 C', priority: 1 });
+    createTodo(db, aliceId, { title: '买菜', priority: 3 });
+
+    const list = getAllTodos(db, aliceId, {
+      done: 'active',
+      priority: 3,
+      q: '课件',
+    });
+    expect(list.map((t) => t.id)).toEqual([a.id]);
+  });
+
+  it("过滤：用户隔离不破（A 的 filter 不会命中 B 的）", () => {
+    const { db, aliceId, bobId } = bootstrap();
+    createTodo(db, aliceId, { title: '工作 A', category: '工作' });
+    createTodo(db, bobId, { title: '工作 B', category: '工作' });
+
+    const list = getAllTodos(db, aliceId, { category: '工作' });
+    expect(list.map((t) => t.title)).toEqual(['工作 A']);
+  });
 });
