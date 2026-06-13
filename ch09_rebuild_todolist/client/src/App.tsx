@@ -1,10 +1,20 @@
 import { Routes, Route, Navigate } from 'react-router-dom';
+import { RequireAuth } from './auth/RequireAuth';
+import LoginPage from './pages/LoginPage';
+import TodosPage from './pages/TodosPage';
 
 export default function App() {
   return (
     <Routes>
-      <Route path="/login" element={<div className="p-10">登录页占位（Task 11 实现）</div>} />
-      <Route path="/" element={<div className="p-10">Todos 页占位（Task 11 实现）</div>} />
+      <Route path="/login" element={<LoginPage />} />
+      <Route
+        path="/"
+        element={
+          <RequireAuth>
+            <TodosPage />
+          </RequireAuth>
+        }
+      />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
