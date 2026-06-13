@@ -1,43 +1,83 @@
 import { describe, it, expect } from 'vitest';
 import { createTestDb } from './setup';
-import { createTodo, getAllTodos, updateTodo, deleteTodo } from '../src/services/todos';
+import {
+  createTodo,
+  getAllTodos,
+  updateTodo,
+  deleteTodo,
+} from '../src/services/todos';
+import { createUser } from '../src/services/users';
+
+function bootstrap() {
+  const db = createTestDb();
+  const alice = createUser(db, { username: 'alice', password: 'pw' });
+  const bob = createUser(db, { username: 'bob', password: 'pw' });
+  return { db, aliceId: alice.id, bobId: bob.id };
+}
 
 describe('todos service', () => {
   it('create + getAll：新建后能查到', () => {
-    const db = createTestDb();
-    const created = createTodo(db, { title: '买牛奶' });
+    const { db, aliceId } = bootstrap();
+    const created = createTodo(db, aliceId, { title: '买牛奶' });
     expect(created.id).toBeGreaterThan(0);
     expect(created.title).toBe('买牛奶');
     expect(created.done).toBe(false);
 
-    const all = getAllTodos(db);
+    const all = getAllTodos(db, aliceId);
     expect(all).toHaveLength(1);
     expect(all[0].title).toBe('买牛奶');
   });
 
   it('update：能改 title 和 done', () => {
-    const db = createTestDb();
-    const t = createTodo(db, { title: '买牛奶' });
-    const updated = updateTodo(db, t.id, { done: true, title: '买脱脂牛奶' });
+    const { db, aliceId } = bootstrap();
+    const t = createTodo(db, aliceId, { title: '买牛奶' });
+    const updated = updateTodo(db, aliceId, t.id, { done: true, title: '买脱脂牛奶' });
     expect(updated).not.toBeNull();
     expect(updated!.done).toBe(true);
     expect(updated!.title).toBe('买脱脂牛奶');
   });
 
   it('update：id 不存在返回 null', () => {
-    const db = createTestDb();
-    expect(updateTodo(db, 999, { done: true })).toBeNull();
+    const { db, aliceId } = bootstrap();
+    expect(updateTodo(db, aliceId, 999, { done: true })).toBeNull();
   });
 
   it('delete：删除后查不到', () => {
-    const db = createTestDb();
-    const t = createTodo(db, { title: '买面包' });
-    expect(deleteTodo(db, t.id)).toBe(true);
-    expect(getAllTodos(db)).toHaveLength(0);
+    const { db, aliceId } = bootstrap();
+    const t = createTodo(db, aliceId, { title: '买面包' });
+    expect(deleteTodo(db, aliceId, t.id)).toBe(true);
+    expect(getAllTodos(db, aliceId)).toHaveLength(0);
   });
 
   it('delete：id 不存在返回 false', () => {
-    const db = createTestDb();
-    expect(deleteTodo(db, 999)).toBe(false);
+    const { db, aliceId } = bootstrap();
+    expect(deleteTodo(db, aliceId, 999)).toBe(false);
+  });
+
+  it('getAll：用户 A 看不到用户 B 的 todos', () => {
+    const { db, aliceId, bobId } = bootstrap();
+    createTodo(db, aliceId, { title: 'alice 1' });
+    createTodo(db, bobId, { title: 'bob 1' });
+    createTodo(db, bobId, { title: 'bob 2' });
+
+    const aliceList = getAllTodos(db, aliceId);
+    expect(aliceList).toHaveLength(1);
+    expect(aliceList[0].title).toBe('alice 1');
+
+    const bobList = getAllTodos(db, bobId);
+    expect(bobList).toHaveLength(2);
+  });
+
+  it('updateTodo / deleteTodo：跨用户访问视为不存在', () => {
+    const { db, aliceId, bobId } = bootstrap();
+    const aliceTodo = createTodo(db, aliceId, { title: '私人事项' });
+
+    // bob 试图改 alice 的 todo
+    expect(updateTodo(db, bobId, aliceTodo.id, { done: true })).toBeNull();
+    // bob 试图删 alice 的 todo
+    expect(deleteTodo(db, bobId, aliceTodo.id)).toBe(false);
+    // alice 自己看仍然在
+    expect(getAllTodos(db, aliceId)).toHaveLength(1);
+    expect(getAllTodos(db, aliceId)[0].done).toBe(false);
   });
 });
