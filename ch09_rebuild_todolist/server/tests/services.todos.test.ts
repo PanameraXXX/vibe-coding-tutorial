@@ -251,4 +251,22 @@ describe('todos service', () => {
     const list = getAllTodos(db, aliceId, { due: 'none' });
     expect(list.map((t) => t.title)).toEqual(['a']);
   });
+
+  it("过滤：q 不区分大小写匹配 title", () => {
+    const { db, aliceId } = bootstrap();
+    createTodo(db, aliceId, { title: 'Read Book' });
+    createTodo(db, aliceId, { title: 'write code' });
+
+    const list = getAllTodos(db, aliceId, { q: 'BOOK' });
+    expect(list.map((t) => t.title)).toEqual(['Read Book']);
+  });
+
+  it("过滤：q 中的 % 转义后匹配字面量", () => {
+    const { db, aliceId } = bootstrap();
+    createTodo(db, aliceId, { title: '完成 50% 进度' });
+    createTodo(db, aliceId, { title: '完成 30 件事' });
+
+    const list = getAllTodos(db, aliceId, { q: '50%' });
+    expect(list.map((t) => t.title)).toEqual(['完成 50% 进度']);
+  });
 });

@@ -50,6 +50,11 @@ function addDays(date: string, n: number): string {
   return `${yyyy}-${mm}-${dd}`;
 }
 
+// 转义 LIKE 中的特殊字符（必须先转 \，再转 % 和 _）
+function escapeLike(input: string): string {
+  return input.replace(/\\/g, '\\\\').replace(/%/g, '\\%').replace(/_/g, '\\_');
+}
+
 export function createTodo(
   db: Database.Database,
   userId: number,
@@ -110,6 +115,11 @@ export function getAllTodos(
   }
   if (filters.due === 'none') {
     where.push('due_date IS NULL');
+  }
+
+  if (filters.q) {
+    where.push(`LOWER(title) LIKE LOWER(?) ESCAPE '\\'`);
+    params.push(`%${escapeLike(filters.q)}%`);
   }
 
   const sql = `SELECT ${SELECT_COLUMNS} FROM todos WHERE ${where.join(' AND ')} ${ORDER_BY}`;
